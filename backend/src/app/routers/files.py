@@ -3,7 +3,7 @@ import io
 import uuid
 from typing import Optional
 
-from azure.storage.blob import BlobServiceClient
+from azure.storage.blob import BlobServiceClient, ContentSettings
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
 from fastapi.responses import StreamingResponse
 
@@ -56,7 +56,7 @@ def upload_to_azure(creds: dict, blob_name: str, data: bytes, content_type: str)
         container=creds["container_name"], blob=blob_name
     )
     blob.upload_blob(
-        data, overwrite=True, content_settings={"content_type": content_type}
+        data, overwrite=True, content_settings=ContentSettings(content_type=content_type)
     )
     return blob_name
 

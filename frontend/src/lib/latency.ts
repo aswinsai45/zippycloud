@@ -10,7 +10,7 @@ export interface LatencyResult {
 // of which cloud region is closer to the user
 const ENDPOINTS: Record<Provider, string> = {
   aws: "https://s3.amazonaws.com",
-  azure: "https://blob.core.windows.net",
+  azure: "https://azure.microsoft.com",
 };
 
 async function probe(provider: Provider): Promise<LatencyResult> {
