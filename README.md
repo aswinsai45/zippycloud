@@ -15,7 +15,7 @@ If one cloud goes down, the other one seamlessly takes over.
 
 ## What Is ZippyCloud?
 
-ZippyCloud lets you store files across two cloud providers at the same time — AWS S3 and Azure Blob Storage. Every file you upload goes to both clouds simultaneously. When you download, the app automatically picks whinclichever cloud is fastest for your network. If one cloud is unavailable, the other takes over without you doing anything.
+ZippyCloud lets you store files across two cloud providers at the same time — AWS S3 and Azure Blob Storage. Every file you upload goes to both clouds simultaneously. When you download, the app automatically picks whichever cloud is fastest for your network. If one cloud is unavailable, the other takes over without you doing anything.
 
 You connect your own AWS and Azure accounts. ZippyCloud never owns your storage — it just orchestrates it.
 
