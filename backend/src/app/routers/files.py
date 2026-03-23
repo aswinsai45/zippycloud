@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 from app.dependencies import get_supabase, get_current_user
 from app.routers.cloud import decrypt_credentials
 import io, uuid
+from app.latency import get_latency_cache
 
 router = APIRouter()
 
@@ -69,17 +70,22 @@ async def upload_file(
     azure_blob = None
     errors = []
 
-    if "aws" in creds:
-        try:
-            aws_key = upload_to_s3(creds["aws"], key, data, content_type)
-        except Exception as e:
-            errors.append(f"AWS: {str(e)}")
+    # Use latency cache to determine upload order
+    cache = get_latency_cache()
+    winner = cache.get("winner", "aws")
+    providers = ["aws", "azure"] if winner == "aws" else ["azure", "aws"]
 
-    if "azure" in creds:
-        try:
-            azure_blob = upload_to_azure(creds["azure"], key, data, content_type)
-        except Exception as e:
-            errors.append(f"Azure: {str(e)}")
+    for provider in providers:
+        if provider == "aws" and "aws" in creds:
+            try:
+                aws_key = upload_to_s3(creds["aws"], key, data, content_type)
+            except Exception as e:
+                errors.append(f"AWS: {str(e)}")
+        elif provider == "azure" and "azure" in creds:
+            try:
+                azure_blob = upload_to_azure(creds["azure"], key, data, content_type)
+            except Exception as e:
+                errors.append(f"Azure: {str(e)}")
 
     if aws_key is None and azure_blob is None:
         raise HTTPException(status_code=500, detail=f"Upload failed on all providers: {'; '.join(errors)}")
