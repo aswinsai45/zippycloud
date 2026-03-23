@@ -22,7 +22,6 @@ export default function AuthPage() {
     setError('')
     setSuccess('')
     setLoading(true)
-
     try {
       if (mode === 'register') {
         const { error } = await supabase.auth.signUp({ email, password })
@@ -40,25 +39,25 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 py-8">
       {/* Background grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:48px_48px]" />
 
       <div className="relative w-full max-w-md">
         {/* Logo */}
-        <div className="flex items-center gap-3 mb-10 justify-center">
-          <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center">
+        <div className="flex items-center gap-3 mb-8 sm:mb-10 justify-center">
+          <div className="w-10 h-10 rounded-xl bg-sky-500 flex items-center justify-center flex-shrink-0">
             <Cloud className="w-5 h-5 text-white" strokeWidth={2.5} />
           </div>
           <span className="text-white text-xl font-bold tracking-tight">ZippyCloud</span>
         </div>
 
         {/* Card */}
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl">
-          <h1 className="text-white text-2xl font-bold mb-1">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 shadow-2xl">
+          <h1 className="text-white text-xl sm:text-2xl font-bold mb-1">
             {mode === 'login' ? 'Welcome back' : 'Create account'}
           </h1>
-          <p className="text-zinc-400 text-sm mb-8">
+          <p className="text-zinc-400 text-sm mb-6 sm:mb-8">
             {mode === 'login'
               ? 'Sign in to manage your multi-cloud files.'
               : 'Start storing files across AWS & Azure.'}
@@ -66,37 +65,41 @@ export default function AuthPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-zinc-300 text-sm font-medium mb-1.5">Email</label>
+              <label className="block text-zinc-300 text-sm font-medium mb-1.5">
+                Email
+              </label>
               <input
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
                 placeholder="you@example.com"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
               />
             </div>
 
             <div>
-              <label className="block text-zinc-300 text-sm font-medium mb-1.5">Password</label>
+              <label className="block text-zinc-300 text-sm font-medium mb-1.5">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
                 placeholder="••••••••"
-                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-2.5 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
+                className="w-full bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white placeholder-zinc-500 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition"
               />
             </div>
 
             {error && (
-              <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-2.5 text-red-400 text-sm">
+              <div className="bg-red-500/10 border border-red-500/30 rounded-lg px-4 py-3 text-red-400 text-sm">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-2.5 text-green-400 text-sm">
+              <div className="bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-3 text-green-400 text-sm">
                 {success}
               </div>
             )}
@@ -104,7 +107,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-sky-500 hover:bg-sky-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-4 py-2.5 text-sm flex items-center justify-center gap-2 transition-colors"
+              className="w-full bg-sky-500 hover:bg-sky-400 active:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg px-4 py-3 text-sm flex items-center justify-center gap-2 transition-colors"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
