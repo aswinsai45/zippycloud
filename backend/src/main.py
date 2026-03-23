@@ -3,11 +3,17 @@ load_dotenv()
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer
 import asyncio
 from app.latency import run_latency_cache
 from app.routers import files, cloud, auth
 
-app = FastAPI(title="ZippyCloud API")
+security = HTTPBearer()
+
+app = FastAPI(
+    title="ZippyCloud API",
+    swagger_ui_parameters={"persistAuthorization": True},
+)
 
 app.add_middleware(
     CORSMiddleware,
