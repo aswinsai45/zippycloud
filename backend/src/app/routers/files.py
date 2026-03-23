@@ -247,3 +247,69 @@ def download_file(
             "X-Preferred": preferred,
         },
     )
+
+@router.delete("/{file_id}")
+def delete_file(
+    file_id: str,
+    user: dict = Depends(get_current_user),
+):
+    supabase = get_supabase()
+    user_id = user["sub"]
+
+    # Get file metadata first
+    row = (
+        supabase.table("files")
+        .select("*")
+        .eq("id", file_id)
+        .eq("user_id", user_id)
+        .execute()
+    )
+    if not row.data:
+        raise HTTPException(status_code=404, detail="File not found")
+
+    file_meta = row.data[0]
+    creds = get_user_credentials(supabase, user_id)
+    errors = []
+
+    # Delete from AWS
+    if file_meta.get("aws_key") and "aws" in creds:
+        try:
+            s3 = boto3.client(
+                "s3",
+                aws_access_key_id=creds["aws"]["access_key_id"],
+                aws_secret_access_key=creds["aws"]["secret_access_key"],
+                region_name=creds["aws"].get("region", "us-east-1"),
+            )
+            s3.delete_object(
+                Bucket=creds["aws"]["bucket_name"],
+                Key=file_meta["aws_key"],
+            )
+        except Exception as e:
+            errors.append(f"AWS: {str(e)}")
+
+    # Delete from Azure
+    if file_meta.get("azure_blob") and "azure" in creds:
+        try:
+            conn_str = (
+                f"DefaultEndpointsProtocol=https;"
+                f"AccountName={creds['azure']['account_name']};"
+                f"AccountKey={creds['azure']['account_key']};"
+                f"EndpointSuffix=core.windows.net"
+            )
+            client = BlobServiceClient.from_connection_string(conn_str)
+            blob = client.get_blob_client(
+                container=creds["azure"]["container_name"],
+                blob=file_meta["azure_blob"],
+            )
+            blob.delete_blob()
+        except Exception as e:
+            errors.append(f"Azure: {str(e)}")
+
+    # Delete metadata from Supabase regardless of cloud errors
+    supabase.table("files").delete().eq("id", file_id).execute()
+
+    return {
+        "deleted": True,
+        "file_id": file_id,
+        "warnings": errors if errors else None,
+    }

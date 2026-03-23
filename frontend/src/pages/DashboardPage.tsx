@@ -320,19 +320,35 @@ export default function DashboardPage() {
   const handleDelete = async (f: ZippyFile) => {
     if (
       !confirm(
-        `Delete "${f.filename}"? This removes the metadata record — delete objects from your cloud consoles manually.`,
+        `Delete "${f.filename}"? This will permanently remove it from AWS S3, Azure, and ZippyCloud.`,
       )
     )
       return;
     setDeletingId(f.id);
-    const { error } = await supabase.from("files").delete().eq("id", f.id);
-    if (error) {
-      toast("error", "Failed to delete file record.");
-    } else {
-      toast("success", `"${f.filename}" removed.`);
+    try {
+      const res = await fetch(`${API}/files/${f.id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (!res.ok) throw new Error("Delete failed");
+      const result = await res.json();
+      if (result.warnings) {
+        toast(
+          "info",
+          `File removed but some cloud cleanup failed: ${result.warnings.join(", ")}`,
+        );
+      } else {
+        toast(
+          "success",
+          `"${f.filename}" permanently deleted from all clouds.`,
+        );
+      }
       setFiles((prev) => prev.filter((x) => x.id !== f.id));
+    } catch (err: any) {
+      toast("error", err.message || "Delete failed");
+    } finally {
+      setDeletingId(null);
     }
-    setDeletingId(null);
   };
 
   const totalSize = files.reduce((acc, f) => acc + (f.size || 0), 0);
