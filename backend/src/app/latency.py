@@ -90,3 +90,35 @@ async def run_latency_cache(creds: dict):
             pass  # never crash the background task
 
         await asyncio.sleep(60)
+async def probe_once(creds: dict) -> dict:
+    aws_ms = None
+    azure_ms = None
+
+    if "aws" in creds:
+        try:
+            result = await _probe_aws(creds["aws"])
+            aws_ms = round(result) if result != float("inf") else None
+        except Exception:
+            aws_ms = None
+
+    if "azure" in creds:
+        try:
+            result = await _probe_azure(creds["azure"])
+            azure_ms = round(result) if result != float("inf") else None
+        except Exception:
+            azure_ms = None
+
+    if aws_ms is not None and azure_ms is not None:
+        winner = "aws" if aws_ms <= azure_ms else "azure"
+    elif aws_ms is not None:
+        winner = "aws"
+    elif azure_ms is not None:
+        winner = "azure"
+    else:
+        winner = "aws"
+
+    return {
+        "aws_ms": aws_ms,
+        "azure_ms": azure_ms,
+        "winner": winner,
+    }

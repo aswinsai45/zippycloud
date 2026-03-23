@@ -2,12 +2,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Literal
 from app.dependencies import get_supabase, get_current_user
-import json, base64, os
+from app.latency import probe_once
+import json, os
 from cryptography.fernet import Fernet
 
 router = APIRouter()
 
-FERNET_KEY = os.environ["FERNET_KEY"]  # generate with Fernet.generate_key()
+FERNET_KEY = os.environ["FERNET_KEY"]
 fernet = Fernet(FERNET_KEY)
 
 def encrypt_credentials(creds: dict) -> str:
@@ -30,7 +31,6 @@ def connect_cloud(
 
     encrypted = encrypt_credentials(body.credentials)
 
-    # Upsert - one connection per provider per user
     existing = (
         supabase.table("cloud_connections")
         .select("id")
@@ -51,3 +51,22 @@ def connect_cloud(
         }).execute()
 
     return {"status": "connected", "provider": body.provider}
+
+@router.get("/latency-check")
+async def latency_check(user: dict = Depends(get_current_user)):
+    """Probe user's actual buckets and return real latency measurements."""
+    supabase = get_supabase()
+    user_id = user["sub"]
+
+    rows = (
+        supabase.table("cloud_connections")
+        .select("*")
+        .eq("user_id", user_id)
+        .execute()
+    )
+    creds = {}
+    for row in rows.data:
+        creds[row["provider"]] = decrypt_credentials(row["credentials"])
+
+    result = await probe_once(creds)
+    return result

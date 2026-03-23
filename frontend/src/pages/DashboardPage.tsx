@@ -199,8 +199,9 @@ export default function DashboardPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const runProbe = async () => {
+    if (!session?.access_token) return "aws"; // don't probe if no session yet
     setProbing(true);
-    const result = await measureBothProviders();
+    const result = await measureBothProviders(session?.access_token || "");
     setAwsLatency(result.aws);
     setAzureLatency(result.azure);
     setFastest(result.fastest);
@@ -229,11 +230,24 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchFiles();
     checkCredentials();
-    runProbe();
-    // Re-probe every 60s
-    const interval = setInterval(runProbe, 60000);
-    return () => clearInterval(interval);
   }, []);
+
+  // Separate effect that waits for session
+  useEffect(() => {
+    if (!session) return;
+
+    // Small delay to ensure session is fully ready
+    const timeout = setTimeout(() => {
+      runProbe();
+    }, 500);
+
+    const interval = setInterval(runProbe, 60000);
+
+    return () => {
+      clearTimeout(timeout);
+      clearInterval(interval);
+    };
+  }, [session]);
 
   const uploadFile = async (file: File) => {
     if (!file) return;
