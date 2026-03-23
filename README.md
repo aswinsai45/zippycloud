@@ -7,7 +7,7 @@
 Upload your files to AWS S3 and Azure Blob Storage simultaneously.
 If one cloud goes down, the other one seamlessly takes over.
 
-[Live Demo](<>) · [Report a Bug](https://github.com/aswinsai45/zippycloud/issues)
+[Access ZippyCloud here](https://zippycloud.vercel.app) · [Report a Bug](https://github.com/aswinsai45/zippycloud/issues)
 
 </div>
 
