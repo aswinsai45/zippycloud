@@ -15,7 +15,7 @@ If one cloud goes down, the other one seamlessly takes over.
 
 ## What Is ZippyCloud?
 
-ZippyCloud lets you store files across two cloud providers at the same time — AWS S3 and Azure Blob Storage. Every file you upload goes to both clouds simultaneously. When you download, the app automatically picks whichever cloud is fastest for your network. If one cloud is unavailable, the other takes over without you doing anything.
+ZippyCloud lets you store files across two cloud providers at the same time — AWS S3 and Azure Blob Storage. Every file you upload goes to both clouds simultaneously. When you download, the app automatically picks whinclichever cloud is fastest for your network. If one cloud is unavailable, the other takes over without you doing anything.
 
 You connect your own AWS and Azure accounts. ZippyCloud never owns your storage — it just orchestrates it.
 
@@ -34,17 +34,20 @@ Visit the app and click **Sign up**. Enter your email and password. You'll be lo
 Before uploading files you need to connect at least one cloud provider. Go to **Settings** in the sidebar.
 
 **To connect AWS S3 you'll need:**
+
 - AWS Access Key ID
 - AWS Secret Access Key
 - S3 Bucket Name
 - Region (e.g. `ap-south-1`)
 
 **To connect Azure Blob Storage you'll need:**
+
 - Storage Account Name
 - Account Key
 - Container Name
 
 Don't have these yet? See the setup guides below:
+
 - [How to get AWS credentials →](#aws-credentials)
 - [How to get Azure credentials →](#azure-credentials)
 
@@ -115,15 +118,15 @@ Go to Settings and click the trash icon next to the connected provider.
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Frontend | React + TypeScript + TailwindCSS (Vite) |
-| Backend | FastAPI (Python) |
-| Auth & Database | Supabase |
-| Cloud A | AWS S3 |
-| Cloud B | Azure Blob Storage |
-| Frontend Deploy | Vercel |
-| Backend Deploy | Render |
+| Layer           | Technology                              |
+| --------------- | --------------------------------------- |
+| Frontend        | React + TypeScript + TailwindCSS (Vite) |
+| Backend         | FastAPI (Python)                        |
+| Auth & Database | Supabase                                |
+| Cloud A         | AWS S3                                  |
+| Cloud B         | Azure Blob Storage                      |
+| Frontend Deploy | Vercel                                  |
+| Backend Deploy  | Render                                  |
 
 ---
 
@@ -143,6 +146,7 @@ Browser probes AWS + Azure latency
 ```
 
 The system has three independent layers:
+
 - **Server-side latency cache** — background task probes clouds every 60s, used to order uploads
 - **Client-side latency probe** — browser measures latency before download, used to route downloads
 - **Failover** — always active, ensures correctness regardless of latency decisions
@@ -191,6 +195,7 @@ cp .env.example .env
 ```
 
 Start:
+
 ```bash
 cd src
 uvicorn main:app --reload
@@ -214,19 +219,19 @@ npm run dev
 
 ### Backend `.env`
 
-| Variable | Description | Where to find |
-|---|---|---|
-| `SUPABASE_URL` | Your Supabase project URL | Settings → General |
-| `SUPABASE_SERVICE_KEY` | Service role secret key | Settings → API Keys → Secret keys |
-| `FERNET_KEY` | Encryption key for credentials | `python generate_fernet_key.py` |
+| Variable               | Description                    | Where to find                     |
+| ---------------------- | ------------------------------ | --------------------------------- |
+| `SUPABASE_URL`         | Your Supabase project URL      | Settings → General                |
+| `SUPABASE_SERVICE_KEY` | Service role secret key        | Settings → API Keys → Secret keys |
+| `FERNET_KEY`           | Encryption key for credentials | `python generate_fernet_key.py`   |
 
 ### Frontend `.env`
 
-| Variable | Description | Where to find |
-|---|---|---|
-| `VITE_SUPABASE_URL` | Your Supabase project URL | Settings → General |
-| `VITE_SUPABASE_ANON_KEY` | Publishable anon key | Settings → API Keys → Publishable key |
-| `VITE_API_URL` | Backend URL | `http://localhost:8000` locally |
+| Variable                 | Description               | Where to find                         |
+| ------------------------ | ------------------------- | ------------------------------------- |
+| `VITE_SUPABASE_URL`      | Your Supabase project URL | Settings → General                    |
+| `VITE_SUPABASE_ANON_KEY` | Publishable anon key      | Settings → API Keys → Publishable key |
+| `VITE_API_URL`           | Backend URL               | `http://localhost:8000` locally       |
 
 ---
 
@@ -244,6 +249,7 @@ npm run dev
 ```
 
 ### Render (backend)
+
 - Root directory: `backend`
 - Build: `pip install -r requirements.txt`
 - Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
@@ -251,6 +257,7 @@ npm run dev
 - Add all three backend env vars
 
 ### Vercel (frontend)
+
 - Root directory: `frontend`
 - Add all three frontend env vars
 - `vercel.json` handles SPA routing automatically
