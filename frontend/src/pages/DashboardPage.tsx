@@ -321,8 +321,8 @@ export default function DashboardPage() {
       toast(
         usedFallback ? "info" : "success",
         usedFallback
-          ? `Downloaded via ${source === "aws" ? "AWS S3" : "Azure"} (fallback — ${preferred === "aws" ? "AWS" : "Azure"} was unavailable).`
-          : `Downloaded from ${source === "aws" ? "AWS S3" : "Azure"} — fastest for your network.`,
+          ? `Downloaded via ${source === "aws" ? "AWS S3" : "Azure Blob"} (fallback — ${preferred === "aws" ? "AWS S3" : "Azure"} was unavailable).`
+          : `Downloaded from ${source === "aws" ? "AWS S3" : "Azure Blob"} — fastest for your network.`,
       );
     } catch (err: any) {
       toast("error", err.message || "Download failed");
