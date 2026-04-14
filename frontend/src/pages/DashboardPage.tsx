@@ -32,7 +32,10 @@ function formatBytes(bytes: number) {
 }
 
 function timeAgo(dateStr: string) {
-  const diff = Date.now() - new Date(dateStr).getTime();
+  const date = dateStr.endsWith("Z")
+    ? new Date(dateStr)
+    : new Date(dateStr + "Z");
+  const diff = Date.now() - date.getTime();
   const m = Math.floor(diff / 60000);
   if (m < 1) return "just now";
   if (m < 60) return `${m}m ago`;
@@ -310,6 +313,7 @@ export default function DashboardPage() {
       if (!res.ok) throw new Error("Download failed");
       const source = res.headers.get("X-Retrieved-From");
       const preferred = res.headers.get("X-Preferred");
+      console.log("source:", source, "preferred:", preferred);
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
