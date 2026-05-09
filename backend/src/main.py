@@ -35,3 +35,7 @@ def root():
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(run_latency_cache({}))
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
